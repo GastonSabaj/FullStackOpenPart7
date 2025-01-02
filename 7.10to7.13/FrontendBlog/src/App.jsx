@@ -1,8 +1,10 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { setNotification, clearNotification } from './reducers/notificationReducer'; // Asegúrate de importar las acciones
+import { setBlogs, appendBlog } from './reducers/blogReducer'; // Los reducers que van a modificar el estado de redux del contexto del blog
 
 //Se importa este hook para poder disparar acciones a los reducers de notificaciones
 import {useNotificationDispatch, useNotificationValue} from "./contexts/NotificationContext" 
+import {useBlogsDispatch, useBlogsValue} from "./contexts/BlogContext"
 
 import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
@@ -14,7 +16,7 @@ import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
+  // const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('') 
   const [user, setUser] = useState(null)
@@ -26,13 +28,13 @@ const App = () => {
 
   const blogFormRef = useRef()
 
-  const dispatch = useDispatch()
-
   //Acá se usa el useNotificationDispatch
   const notificationDispatch = useNotificationDispatch()
-
   //Esta variable contiene el valor del estado de notificaciones
   const notificationStateValue = useNotificationValue()
+
+  const blogsDispatch = useBlogsDispatch()
+  const blogsStateValue = useBlogsValue()
 
   //Este useEffect sirve para que si ya estabas logeado, te continue logeado mas allá de que refresques la página
   useEffect(() => {
@@ -50,8 +52,10 @@ const App = () => {
     console.log("Se actualizó el usuario!!")
     if (user) {
       blogService.getAll().then(blogs =>
-        setBlogs(blogs)
+        blogsDispatch(setBlogs(blogs))
       )
+
+      console.log("El valor de blogs ahora es: ", blogsStateValue)
     } else {
       setBlogs([])  // Limpiar los blogs cuando no hay usuario logueado
     }
@@ -141,9 +145,13 @@ const App = () => {
     // console.log(blogObject)
     blogFormRef.current.toggleVisibility()
     blogService
-      .createBlog(blogObject)
+      .createBlog(blogObject) // Envío el blogObject al backend
       .then(returnedBlog => {
-        setBlogs(blogs.concat(returnedBlog))
+
+        //De esta manera disparo la accion de appendBlog para actualizar el redux-state del contexto de blogs
+        blogsDispatch(appendBlog(returnedBlog))
+        console.log("Ahora el nuevo valor del estado de blogs de redux es: ", blogsStateValue)
+
         //setErrorMessage("Blog creado exitosamente!")
         notificationDispatch(setNotification(`A new blog "${returnedBlog.title}" by ${returnedBlog.author} added!`));
         // setNotification(`A new blog "${returnedBlog.title}" by ${returnedBlog.author} added!`)
@@ -168,12 +176,12 @@ const App = () => {
 
   const handleDeleteBlog = (id) => {
     console.log("Elimino el blog: ", id)
-    setBlogs(blogs.filter(blog => blog.id !== id));  // Filtra el blog eliminado de la lista
-    // setNotification(`Blog deleted successfully!`);
-    // setNotificationType('success');
-    // setTimeout(() => {
-    //   setNotification(null);
-    // }, 5000);
+    blogsDispatch(setBlogs(blogs.filter(blog => blog.id !== id)));  // Filtra el blog eliminado de la lista
+    notificationDispatch(setNotification(`Blog deleted successfully!`));
+    setNotificationType('success');
+    setTimeout(() => {
+      notificationDispatch(clearNotification());
+    }, 5000);
   };
 
   return (
@@ -200,7 +208,8 @@ const App = () => {
           </Togglable>
           
           <h2>blogs</h2>
-          {blogs
+          {blogsStateValue
+            .slice() // crea una copia del arreglo, dado que el estado de redux es inmutable y la funcion .sort modifica al array
             .sort((a, b) => b.likes - a.likes)
             .map(blog =>
               <Blog key={blog.id} blog={blog} user={user} onDelete={handleDeleteBlog} />

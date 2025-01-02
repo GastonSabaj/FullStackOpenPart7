@@ -5,11 +5,14 @@ import './index.css'
 import { Provider } from 'react-redux'
 import store from './store'
 import {NotificationContextProvider} from "./contexts/NotificationContext" 
+import { BlogContextProvider } from './contexts/BlogContext'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <Provider store={store}>
-        <NotificationContextProvider>
-        <App />
-      </NotificationContextProvider>
+        <BlogContextProvider>
+          <NotificationContextProvider>
+            <App />
+          </NotificationContextProvider>
+        </BlogContextProvider>
     </Provider>
   )
