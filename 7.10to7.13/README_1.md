@@ -1,0 +1,1 @@
+Si tengo dudas respecto de React Query ó React Context , me tengo que ir a los ejs de la parte 6.

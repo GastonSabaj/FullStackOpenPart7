@@ -1,3 +1,9 @@
+import { useDispatch, useSelector } from 'react-redux'
+import { setNotification, clearNotification } from './reducers/notificationReducer'; // Asegúrate de importar las acciones
+
+//Se importa este hook para poder disparar acciones a los reducers de notificaciones
+import {useNotificationDispatch, useNotificationValue} from "./contexts/NotificationContext" 
+
 import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
@@ -15,10 +21,18 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
 
-  const [notification, setNotification] = useState(null)
+  // const [notification, setNotification] = useState(null)
   const [notificationType, setNotificationType] = useState('')
 
   const blogFormRef = useRef()
+
+  const dispatch = useDispatch()
+
+  //Acá se usa el useNotificationDispatch
+  const notificationDispatch = useNotificationDispatch()
+
+  //Esta variable contiene el valor del estado de notificaciones
+  const notificationStateValue = useNotificationValue()
 
   //Este useEffect sirve para que si ya estabas logeado, te continue logeado mas allá de que refresques la página
   useEffect(() => {
@@ -64,18 +78,29 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
-      console.log("Login exitoso!")
-      setNotification("Login exitoso!")
+      //console.log("Login exitoso!")
+
+      //useNotificationDispatch(setNotification("Login exitoso!"))
+
+      notificationDispatch(setNotification(`Login exitoso!`));
+      console.log("La notificacion (el valor del state de redux) es: ", notificationStateValue)
+
+      //setNotification("Login exitoso!")
+      
+      //Seteo el tipo de notificación para que se muestre de color verde
       setNotificationType('success')
       setTimeout(() => {
-        setNotification(null)
+        notificationDispatch(clearNotification())
+        //setNotification(null)
       }, 5000)
     } catch (exception) {
       console.log("Login fallido!")
-      setNotification("Login fallido!")
+      notificationDispatch(setNotification(`Login fallido!`));
+      // setNotification("Login fallido!")
       setNotificationType('error')
       setTimeout(() => {
-        setNotification(null)
+        //setNotification(null)
+        notificationDispatch(clearNotification())
       }, 5000)
     }
   }
@@ -120,18 +145,21 @@ const App = () => {
       .then(returnedBlog => {
         setBlogs(blogs.concat(returnedBlog))
         //setErrorMessage("Blog creado exitosamente!")
-        setNotification(`A new blog "${returnedBlog.title}" by ${returnedBlog.author} added!`)
+        notificationDispatch(setNotification(`A new blog "${returnedBlog.title}" by ${returnedBlog.author} added!`));
+        // setNotification(`A new blog "${returnedBlog.title}" by ${returnedBlog.author} added!`)
         setNotificationType('success')
         setTimeout(() => {
           setNotification(null)
         }, 5000)
-        //event.target.reset()  // Limpiar el formulario después de la creación
+
+        // event.target.reset()  // Limpiar el formulario después de la creación
 
         console.log("El id de returnedBlog es: ",returnedBlog.id)
       })
       .catch(error => {
         console.log(error)
-        setErrorMessage(error.response.data.error)
+        //setErrorMessage(error.response.data.error)
+      
         setTimeout(() => {
           setErrorMessage(null)
         }, 5000)
@@ -141,17 +169,18 @@ const App = () => {
   const handleDeleteBlog = (id) => {
     console.log("Elimino el blog: ", id)
     setBlogs(blogs.filter(blog => blog.id !== id));  // Filtra el blog eliminado de la lista
-    setNotification(`Blog deleted successfully!`);
-    setNotificationType('success');
-    setTimeout(() => {
-      setNotification(null);
-    }, 5000);
+    // setNotification(`Blog deleted successfully!`);
+    // setNotificationType('success');
+    // setTimeout(() => {
+    //   setNotification(null);
+    // }, 5000);
   };
 
   return (
     <div>
       {/* <Notification message={errorMessage} /> */}
-      <Notification message={notification} type={notificationType} />
+      {/* <Notification message={notification} type={notificationType} /> */}
+      <Notification message={notificationStateValue} type={notificationType}  />
 
       {user === null ?
       loginForm() :
