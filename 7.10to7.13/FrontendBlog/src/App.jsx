@@ -1,10 +1,12 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { setNotification, clearNotification } from './reducers/notificationReducer'; // Asegúrate de importar las acciones
 import { setBlogs, appendBlog } from './reducers/blogReducer'; // Los reducers que van a modificar el estado de redux del contexto del blog
+import { setUser } from './reducers/loginReducer';
 
 //Se importa este hook para poder disparar acciones a los reducers de notificaciones
 import {useNotificationDispatch, useNotificationValue} from "./contexts/NotificationContext" 
 import {useBlogsDispatch, useBlogsValue} from "./contexts/BlogContext"
+import { useUserDispatch, useUserValue } from './contexts/LoginContext';
 
 import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
@@ -19,7 +21,7 @@ const App = () => {
   // const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('') 
-  const [user, setUser] = useState(null)
+  // const [user, setUser] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
 
@@ -36,12 +38,16 @@ const App = () => {
   const blogsDispatch = useBlogsDispatch()
   const blogsStateValue = useBlogsValue()
 
+  const userDispatch = useUserDispatch()
+  const user = useUserValue()
+
   //Este useEffect sirve para que si ya estabas logeado, te continue logeado mas allá de que refresques la página
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
+      userDispatch(setUser(user))
+      // setUser(user)
       blogService.setToken(user.token)
       userService.setToken(user.token)
     }
@@ -79,7 +85,8 @@ const App = () => {
       ) 
       blogService.setToken(user.token)
       userService.setToken(user.token)
-      setUser(user)
+      userDispatch(setUser(user))
+      // setUser(user)
       setUsername('')
       setPassword('')
       //console.log("Login exitoso!")
@@ -176,7 +183,7 @@ const App = () => {
 
   const handleDeleteBlog = (id) => {
     console.log("Elimino el blog: ", id)
-    blogsDispatch(setBlogs(blogs.filter(blog => blog.id !== id)));  // Filtra el blog eliminado de la lista
+    blogsDispatch(setBlogs(blogsStateValue.filter(blog => blog.id !== id)));  // Filtra el blog eliminado de la lista
     notificationDispatch(setNotification(`Blog deleted successfully!`));
     setNotificationType('success');
     setTimeout(() => {
@@ -196,7 +203,8 @@ const App = () => {
           <p>{user.name} logged-in</p>
           <button onClick={() => {
             window.localStorage.clear()
-            setUser(null) 
+            userDispatch(setUser(null))
+            //setUser(null) 
             blogService.setToken(null)
             userService.setToken(null)
           }} data-testid='logout-button'>logout</button>
