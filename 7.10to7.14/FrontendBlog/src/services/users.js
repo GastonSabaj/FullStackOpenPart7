@@ -29,4 +29,9 @@ const getUser = async (userLocalStorage) => {
   return response.data
 }
 
-export default { getUser, setToken, getToken }
+const getAllUsers = async () => {
+  const response = await axios.get(baseUrl)
+  return response.data
+}
+ 
+export default { getUser, getAllUsers, setToken, getToken }

@@ -2,9 +2,12 @@ import { useState, useEffect } from 'react'
 import { useNotificationValue } from '../contexts/NotificationContext'
 
 
-const Notification = ({ message, type }) => {
+const Notification = () => {
   const [visible, setVisible] = useState(true)
+  const notification = useNotificationValue()
 
+  const { message, type } = notification
+  
   // Este useEffect sirve para desaparecer la notificación al final de 4 segundos
   useEffect(() => {
     if (message) {

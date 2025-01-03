@@ -7,7 +7,7 @@ const NotificationContext = createContext()
 
 export const NotificationContextProvider = (props) => {
   //Lo que hago acá es definir el estado y el dispatch, donde el estado es la notificacion y el dispatch es el dispatch  
-  const [notification, notificationDispatch] = useReducer(notificationSlice, '')
+  const [notification, notificationDispatch] = useReducer(notificationSlice, {message:'', type: ''})
 
   return (
     <NotificationContext.Provider value={[notification, notificationDispatch] }>
