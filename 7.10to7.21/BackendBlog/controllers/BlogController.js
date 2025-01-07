@@ -21,6 +21,11 @@ blogRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 });
   response.json(blogs)
 })
+
+blogRouter.get('/:id', async (request, response) => {
+  const blog = await Blog.findById(request.params.id)
+  response.json(blog)
+})
   
 blogRouter.post('/', async (request, response, next) => {
   try{
@@ -117,5 +122,23 @@ blogRouter.put('/:id', async (request, response, next) => {
     next(exception);
   }
 });
+
+blogRouter.post('/:id/comments', async (request, response, next) => {
+  try{
+    const blog = await Blog.findById(request.params.id)
+    console.log("El valor del comment es: ", request.body.comment)
+
+    if (request.body.comment) {
+      // Agregar el comentario al array de comentarios del blog
+      blog.comments = blog.comments.concat(request.body.comment);
+      await blog.save();  // Guardar el blog con el comentario nuevo
+    }
+    
+    response.status(200).json(blog)
+
+  }catch(exception){
+    next(exception)
+  }
+})
 
 module.exports = blogRouter

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import  blogService  from '../services/blogs'
 import userService from '../services/users'
 
 const Blog = ({ blog, onDelete, user, onLikeHandler }) => {
   console.log("El usuario del Blog.jsx es :",user)
   console.log("El blog recibido por props vale: ",blog)
-  const [visible, setVisible] = useState(false)
+  // const [visible, setVisible] = useState(false)
   const [blogObject, setBlogObject] = useState(blog)
   //const [likes, setLikes] = useState(blog.likes)
 
@@ -23,9 +24,9 @@ const Blog = ({ blog, onDelete, user, onLikeHandler }) => {
     marginBottom: 5
   }
 
-  const toggleVisibility = () => {
-    setVisible(!visible)
-  }
+  // const toggleVisibility = () => {
+  //   setVisible(!visible)
+  // }
 
   const addLike = () => {
     const updatedBlog = { ...blogObject, likes: blogObject.likes + 1 };
@@ -43,7 +44,7 @@ const Blog = ({ blog, onDelete, user, onLikeHandler }) => {
   const deleteBlog =  () => {
 
 
-    userService.getUser(user).then((usuarioLogeado) => {
+    userService.getLoggedUser(user).then((usuarioLogeado) => {
       //Si el usuario logeado coincide con el usuario creador del blog, entonces puedo borrarlo
       console.log("el usuario logeado es: ",usuarioLogeado)
       console.log("el blogObject es: ",blogObject)
@@ -69,24 +70,13 @@ const Blog = ({ blog, onDelete, user, onLikeHandler }) => {
 
   return (
     <div style={blogStyle}>
-      {!visible && (
         <div>
-          <span data-testid={`blog-title-${blogObject.id}`}>{blogObject.title}</span> 
-          <span data-testid={`blog-author-${blogObject.id}`}>{blogObject.author}</span>
-          <button data-testid={`view-button-${blogObject.id}`} onClick={toggleVisibility}>view</button>
+          <span data-testid={`blog-title-${blogObject.id}`}> 
+            <Link to={`/blogs/${blogObject.id}`}> 
+              {blogObject.title} 
+            </Link>
+          </span> 
         </div>
-      )}
-      {visible && (
-        <div>
-          <p data-testid={`blog-title-${blogObject.id}`}>{blogObject.title}</p>
-          <p data-testid={`blog-author-${blogObject.id}`}>{blogObject.author}</p>
-          <p data-testid={`blog-url-${blogObject.id}`}>{blogObject.url}</p>
-          <p data-testid={`blog-likes-${blogObject.id}`}>likes {blogObject.likes}</p>
-          <button data-testid={`like-button-${blogObject.id}`} onClick={addLike}>like</button>
-          <button onClick={toggleVisibility}>hide</button>
-          <button data-testid={`remove-button-${blogObject.id}`} style={{ backgroundColor: 'red' }} onClick={deleteBlog}>delete</button>
-        </div>
-      )}
     </div>
   );
 

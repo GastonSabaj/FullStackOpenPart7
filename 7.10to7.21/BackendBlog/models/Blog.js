@@ -11,7 +11,8 @@
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
-    }
+    },
+    comments: [String] //Es un array de strings
   });
   
   blogSchema.set('toJSON', {

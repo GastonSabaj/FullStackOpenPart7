@@ -21,6 +21,7 @@ import {
   useNavigate,
 } from "react-router-dom"
 
+import { Container, Row, Col, Navbar } from 'react-bootstrap';
 
 import { useState, useEffect, useRef } from 'react'
 
@@ -35,6 +36,11 @@ import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
 import Users from './components/Users'
+import UserDetails from './components/UserDetails';
+import BlogDetails from './components/BlogDetails';
+
+import './index.css';
+
 
 const App = () => {
 
@@ -144,21 +150,32 @@ const App = () => {
 
       {user === null ? loginForm() :
         <div>
-            <p>{user.username} logged-in</p>
-            {/* Boton de deslogeo */}
-            <button onClick={() => {
-              window.localStorage.clear()
-              userDispatch(setUser(null))
-              //setUser(null) 
-              blogService.setToken(null)
-              userService.setToken(null)
-            }} data-testid='logout-button'>logout</button>
+          
+          <div className="navbar">
+            <div className="navbar-item"><a href="/users">users</a></div>
+            <div className="navbar-item"><a href="/">blogs</a></div>
+            <div style={{ marginLeft: '10px', color: 'black'}}> <b> {user.username} logged-in </b></div>
+            <div style={{ marginLeft: '10px'}}> 
+              {/* Boton de deslogeo */}
+              <button onClick={() => {
+                window.localStorage.clear()
+                userDispatch(setUser(null))
+                //setUser(null) 
+                blogService.setToken(null)
+                userService.setToken(null)
+              }} data-testid='logout-button'>logout</button>
+            </div>
+          </div>
+            
+
 
             {/* Defino las rutas */}
             <Router>
               <Routes>
                 <Route path="/" element={<Blogs user={user} />} />
                 <Route path="/users" element={<Users />} />
+                <Route path="/users/:id" element={<UserDetails />} />
+                <Route path="/blogs/:id" element={<BlogDetails />} />
               </Routes>
             </Router>
         </div>

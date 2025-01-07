@@ -1,0 +1,15 @@
+POST http://localhost:3004/api/blogs/6706723b40c4930313d5dff4/comments
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sdXVra2FpMSIsImlkIjoiNjc3YmRlOTNjMDMwZWQxMjJkOTk3YTBlIiwiaWF0IjoxNzM2MTc4ODUwLCJleHAiOjE3MzYxODI0NTB9.FuoLOse1KKiSC1iAfnhOucEYiGZToShxS-SRKbQ_bR0
+
+{
+    "comment": "Este es un comentario de prueba"
+}
+//////////////////////////////////////    Ejemplo request login:
+# POST http://localhost:3004/api/login 
+# Content-Type: application/json
+
+# {
+# "username":"mluukkai1",
+# "password":"mluukkai1"
+# }
